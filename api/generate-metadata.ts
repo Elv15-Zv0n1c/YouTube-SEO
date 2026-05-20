@@ -16,6 +16,9 @@ export default async function handler(req: any, res: any) {
 
     const { transcript } = req.body;
 
+const shortenedTranscript =
+  transcript.slice(0, 12000);
+
     const completion =
       await groq.chat.completions.create({
 
