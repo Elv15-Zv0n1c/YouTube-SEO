@@ -50,10 +50,15 @@ ${shortenedTranscript}
       });
 
     const content =
-      completion.choices[0]?.message?.content || "";
+  completion.choices[0]?.message?.content || "";
 
-    const parsed =
-      JSON.parse(content);
+// Markdown-Codefences entfernen
+const cleaned = content
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .trim();
+
+const parsed = JSON.parse(cleaned);
 
     res.status(200).json(parsed);
 
