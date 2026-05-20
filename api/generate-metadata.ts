@@ -28,7 +28,10 @@ export default async function handler(req: any, res: any) {
             content: `
 Erstelle aus diesem YouTube-Transkript SEO-Metadaten.
 
-Antworte AUSSCHLIESSLICH im JSON-Format.
+Antworte AUSSCHLIESSLICH mit gültigem JSON.
+KEINE Markdown-Blöcke.
+KEIN ```json.
+KEIN zusätzlicher Text.
 
 Format:
 
