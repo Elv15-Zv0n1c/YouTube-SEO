@@ -16,7 +16,6 @@ export default async function handler(req: any, res: any) {
 
     const { transcript } = req.body;
 
-    // Transkript kürzen, um Token-Limits zu vermeiden
     const shortenedTranscript =
       transcript.slice(0, 12000);
 
@@ -26,9 +25,23 @@ export default async function handler(req: any, res: any) {
         messages: [
           {
             role: "user",
-            content: `Analysiere dieses YouTube-Transkript und erstelle SEO-Metadaten:
+            content: `
+Erstelle aus diesem YouTube-Transkript SEO-Metadaten.
 
-${shortenedTranscript}`,
+Antworte AUSSCHLIESSLICH im JSON-Format.
+
+Format:
+
+{
+  "title": "",
+  "description": "",
+  "tags": [],
+  "chapters": []
+}
+
+Transkript:
+${shortenedTranscript}
+`,
           },
         ],
 
@@ -36,10 +49,13 @@ ${shortenedTranscript}`,
 
       });
 
-    res.status(200).json({
-      result:
-        completion.choices[0]?.message?.content || "",
-    });
+    const content =
+      completion.choices[0]?.message?.content || "";
+
+    const parsed =
+      JSON.parse(content);
+
+    res.status(200).json(parsed);
 
   } catch (error: any) {
 
