@@ -1,0 +1,6 @@
+{
+  "name": "YouTube SEO Metadaten Generator",
+  "description": "Professional YouTube SEO tool for seamless chapter timestamps with emojis, optimized content descriptions, and tags conforming to the 495-character limit.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
