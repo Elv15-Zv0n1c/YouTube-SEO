@@ -5,32 +5,25 @@ const groq = new Groq({
 });
 
 export default async function handler(req: any, res: any) {
-
   if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Method not allowed",
-    });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-
     const { transcript } = req.body;
 
-    const shortenedTranscript =
-      transcript.slice(0, 12000);
+    const shortenedTranscript = transcript.slice(0, 12000);
 
-    const completion =
-      await groq.chat.completions.create({
-
-        messages: [
-          {
-            role: "user",
-            content: `
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: `
 Erstelle aus diesem YouTube-Transkript SEO-Metadaten.
 
 Antworte AUSSCHLIESSLICH mit gültigem JSON.
 KEINE Markdown-Blöcke.
-KEIN ```json.
+KEIN \`\`\`json.
 KEIN zusätzlicher Text.
 
 Format:
@@ -45,31 +38,30 @@ Format:
 Transkript:
 ${shortenedTranscript}
 `,
-          },
-        ],
+        },
+      ],
+      model: "llama-3.3-70b-versatile",
+    });
 
-        model: "llama-3.3-70b-versatile",
+    let content = completion.choices[0]?.message?.content;
 
-      });
+    if (!content) {
+      throw new Error("Leere Antwort von Groq erhalten");
+    }
 
-    const content =
-  completion.choices[0]?.message?.content || "";
+    // Sicherheitsbereinigung
+    content = content
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
-// Markdown-Codefences entfernen
-const cleaned = content
-  .replace(/```json/g, "")
-  .replace(/```/g, "")
-  .trim();
+    const parsed = JSON.parse(content);
 
-const parsed = JSON.parse(cleaned);
-
-    res.status(200).json(parsed);
-
+    return res.status(200).json(parsed);
   } catch (error: any) {
-
     console.error(error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: error.message || "Fehler beim Generieren",
     });
   }
