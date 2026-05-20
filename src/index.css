@@ -6,3 +6,12 @@
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: white;
+  color: black;
+  font-family: Inter, system-ui, sans-serif;
+}
