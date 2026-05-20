@@ -81,7 +81,7 @@ WICHTIG: Verwende in allen von dir generierten Feldern (Kapiteln, Beschreibungen
 `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.0-flash",
         contents: prompt,
         config: {
           systemInstruction: "Du bist ein erfahrener YouTube-SEO-Experte und deutschsprachiger Metadaten-Optimierer. Gib die Antwort exakt im vorgegebenen JSON-Schema zurück. Verwende absolut kein Markdown in deinen Textfeldern und Werten.",
