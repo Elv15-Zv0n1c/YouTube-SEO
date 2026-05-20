@@ -4,15 +4,24 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+const emptyResponse = {
+  title: "",
+  description: "",
+  tags: [],
+  chapters: [],
+};
+
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json(emptyResponse);
   }
 
   try {
     const { transcript } = req.body;
 
-    const shortenedTranscript = transcript.slice(0, 12000);
+    if (!transcript) {
+      return res.status(400).json(emptyResponse);
+    }
 
     const completion = await groq.chat.completions.create({
       messages: [
@@ -22,12 +31,10 @@ export default async function handler(req: any, res: any) {
 Erstelle aus diesem YouTube-Transkript SEO-Metadaten.
 
 Antworte AUSSCHLIESSLICH mit gültigem JSON.
-KEINE Markdown-Blöcke.
-KEIN \`\`\`json.
-KEIN zusätzlicher Text.
+KEIN Markdown.
+KEIN Text.
 
 Format:
-
 {
   "title": "",
   "description": "",
@@ -36,7 +43,7 @@ Format:
 }
 
 Transkript:
-${shortenedTranscript}
+${transcript.slice(0, 12000)}
 `,
         },
       ],
@@ -46,23 +53,27 @@ ${shortenedTranscript}
     let content = completion.choices[0]?.message?.content;
 
     if (!content) {
-      throw new Error("Leere Antwort von Groq erhalten");
+      return res.status(200).json(emptyResponse);
     }
 
-    // Sicherheitsbereinigung
+    // Cleanup
     content = content
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    const parsed = JSON.parse(content);
+    let parsed;
+
+    try {
+      parsed = JSON.parse(content);
+    } catch (e) {
+      console.log("JSON PARSE FAILED:", content);
+      return res.status(200).json(emptyResponse);
+    }
 
     return res.status(200).json(parsed);
   } catch (error: any) {
     console.error(error);
-
-    return res.status(500).json({
-      error: error.message || "Fehler beim Generieren",
-    });
+    return res.status(200).json(emptyResponse);
   }
 }
