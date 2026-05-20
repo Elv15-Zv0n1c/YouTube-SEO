@@ -16,8 +16,9 @@ export default async function handler(req: any, res: any) {
 
     const { transcript } = req.body;
 
-const shortenedTranscript =
-  transcript.slice(0, 12000);
+    // Transkript kürzen, um Token-Limits zu vermeiden
+    const shortenedTranscript =
+      transcript.slice(0, 12000);
 
     const completion =
       await groq.chat.completions.create({
@@ -27,7 +28,7 @@ const shortenedTranscript =
             role: "user",
             content: `Analysiere dieses YouTube-Transkript und erstelle SEO-Metadaten:
 
-${transcript}`,
+${shortenedTranscript}`,
           },
         ],
 
